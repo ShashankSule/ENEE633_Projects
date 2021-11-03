@@ -19,17 +19,18 @@ express_faces_flattened = express_faces_flattened';
 % the number of pixels in each image 
 
 Raw_data = [neutral_faces_flattened; express_faces_flattened]; 
-labels = [ones(200,1); 2*ones(200,1)]; 
+labels = [ones(200,1); -1*ones(200,1)]; 
 %% PCA it here
 [coeff, score, latent] = pca(Raw_data); % pca this shit 
 % coeff are the eigenvectors
 % score are the projections
 % latent are the eigenvalues 
-data = score(:,1:50); % Pick the first 50 principal components based on 
+data = score(:,1:20); % Pick the first 50 principal components based on 
                       % eigenvalue decay 
 
+% Note: Score coordinates 2,3,4 lead to highly linearly separable data. 
+% Use this! 
 %% Write data to file
-
 
 
 
