@@ -8,7 +8,7 @@ dim = length(x);
 g = gfun(x);
 H = Hfun(x);
 iter = 0;
-itermax = 2000;
+itermax = 20000;
 m = size(A,1); % the number of constraints
 % W = working set, the set of active constrains
 I = (1:m)';
@@ -75,7 +75,7 @@ while iter < itermax
     end
     iter = iter + 1;
     xiter = [xiter,x];
-    fprintf('iter = ',iter, '\n'); 
+    %fprintf('iter = ',iter, '\n'); 
 end
 if iter == itermax
     fprintf('Stopped because the max number of iterations %d is performed\n',iter);

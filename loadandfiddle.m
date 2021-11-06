@@ -1,3 +1,4 @@
+function [data,y] = loadandfiddle()
 %% Load DATA here
 
 load('data.mat')
@@ -31,6 +32,6 @@ data = score(:,2:4); % Pick the first 50 principal components based on
 % Note: Score coordinates 2,3,4 lead to highly linearly separable data. 
 % Use this! 
 %% Write data to file
-
+end
 
 
