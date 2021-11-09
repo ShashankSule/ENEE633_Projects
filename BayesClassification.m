@@ -16,4 +16,3 @@ end
 indicator = abs(bayes_labels - y)/2; % form I_{y_n != F(x_n)}
 trainingerr = (1/n)*sum(indicator); % compute training error
 
-
