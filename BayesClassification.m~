@@ -3,7 +3,6 @@
 % Compute labels here
 
 [data, y] = loadandfiddle(); 
-n = size(data,1);
 [class1, class2, mu_1, mu_2, sigma_1, sigma_2] = preprocess(data,y); 
 bayes_labels = zeros(size(data,1),1); 
 for i=1:size(bayes_labels)
