@@ -1,4 +1,4 @@
-function [xiter,lm] = ASM(x,gfun,Hfun,A,b,W)
+function [xiter,lm] = ASM(x,gfun,Hfun,A,b,W, itermax)
 %% minimization using the active set method (Nocedal & Wright, Section 16.5)
 %% the objective function must be positive definite
 % Solves f(x) --> min subject to Ax >= b
@@ -8,7 +8,9 @@ dim = length(x);
 g = gfun(x);
 H = Hfun(x);
 iter = 0;
-itermax = 20000;
+if ~exist('itermax', 'var')
+     itermax = 20000;
+end
 m = size(A,1); % the number of constraints
 % W = working set, the set of active constrains
 I = (1:m)';
@@ -78,6 +80,6 @@ while iter < itermax
     %fprintf('iter = ',iter, '\n'); 
 end
 if iter == itermax
-    fprintf('Stopped because the max number of iterations %d is performed\n',iter);
+    %fprintf('Stopped because the max number of iterations %d is performed\n',iter);
 end
 end

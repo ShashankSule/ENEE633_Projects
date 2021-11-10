@@ -83,7 +83,7 @@ B = (1/y(slack_var)*soln(slack_var)) - wASM(slack_var); % use comp slack
 
 % Computing B via soft margin support vectors
 % avg = XX(soln == max(soln(y==1)),:) ...
-  + XX(soln == max(soln(y==-1)),:);
+%  + XX(soln == max(soln(y==-1)),:);
 % avg = XX(abs(soln(y==1)-(c/2)) == min(abs(soln(y==1)-(c/2))),:) ...
 %       + XX(abs(soln(y==-1)-(c/2)) == min(abs(soln(y==-1)-(c/2))),:); 
 % B = -0.5*(avg * wASM);
