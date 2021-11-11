@@ -13,7 +13,7 @@ n = length(y); % number of data points
 %                                                              program 
 
 % set kernel 
-sigma = 0.1; % variance parameter 
+sigma = 10; % variance parameter 
 
 k = @(x,y) exp(-(norm(x-y)^2)/(2*sigma));
 XX = zeros(n,n); 
@@ -50,7 +50,7 @@ D01 = D(1:end-1,end);
 D10 = D(end,1:end-1);
 D11 = D(end,end);
 %new matrix
-Htil = D00 + y(1:n-1)'*D11*y(1:n-1) - (1/yn)*y(1:n-1)*D10 ...
+Htil = D00 + y(1:n-1)*D11*y(1:n-1)' - (1/yn)*y(1:n-1)*D10 ...
        - (1/yn)*D01*y(1:n-1)'; % new hessian 
 d = ones(n-1, 1) - (1/yn)*y(1:n-1); % new first order term 
 cons = (-1/yn)*y(1:n-1)'; % last row of lhs of constraints
@@ -62,7 +62,7 @@ b = zeros(n,1); % rhs of constraints
 x = zeros(n-1,1); % the initialization is zeros everywhere
 W = 1:n; % at the initial point all constraints are active
 W = W'; % making the set of active constraints a column vector 
-Htil = Htil + 10*eye(n-1,n-1); % Make sure to avoid shitty preconditioning
+Htil = Htil - (min(eig(Htil)) - 1)*eye(n-1,n-1); % Make sure to avoid shitty preconditioning
 gfun = @(x)Htil*x - d; %gradient function
 Hfun = @(x)Htil; %hessian function 
 %% Time to run the solver! 
@@ -75,18 +75,18 @@ soln = [soln; lambend]; % put all the lambda's together
 opt = zeros(n,1); 
 pos_lams = find(soln > 1e-6); %find all the lambdas that are actually pos
 opt(pos_lams) = soln(pos_lams); %opt is now the vector of all the positive lambdas
- 
-%computing b: 
+%  
+% % computing b: 
 wASM = (XX')*(y .* soln); % wASM here is phi, the vector of evaluations
-slack_var = find(opt > 0, 1); % pick a support vector
-B = (1/y(slack_var)*soln(slack_var)) - wASM(slack_var); % use comp slack
+% slack_var = find(opt > 0, 1); % pick a support vector
+% B = (1/(y(slack_var)*soln(slack_var))) - wASM(slack_var); % use comp slack
 
 % Computing B via soft margin support vectors
-% avg = XX(soln == max(soln(y==1)),:) ...
-%  + XX(soln == max(soln(y==-1)),:);
+avg = XX(soln == max(soln(y==1)),:) ...
+ + XX(soln == max(soln(y==-1)),:);
 % avg = XX(abs(soln(y==1)-(c/2)) == min(abs(soln(y==1)-(c/2))),:) ...
 %       + XX(abs(soln(y==-1)-(c/2)) == min(abs(soln(y==-1)-(c/2))),:); 
-% B = -0.5*(avg * wASM);
+B = -0.5*(avg * wASM);
 wASM = wASM + B; 
 % wASM = [wASM; B];
 % wASM = real(wASM); 

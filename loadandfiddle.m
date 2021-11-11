@@ -26,7 +26,7 @@ y = [ones(200,1); -1*ones(200,1)];
 % coeff are the eigenvectors
 % score are the projections
 % latent are the eigenvalues 
-data = score(:,1:20); % Pick the first 50 principal components based on 
+data = score(:,1:50); % Pick the first 50 principal components based on 
                       % eigenvalue decay 
 
 % Note: Score coordinates 2,3,4 lead to highly linearly separable data. 

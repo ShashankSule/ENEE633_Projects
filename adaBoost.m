@@ -22,7 +22,7 @@ end
 for i=1:K 
     fprintf('Boosting... \n'); 
     p = weights/sum(weights); % Renormalized weight vectors
-    [theta,b,epsilon] = WeakClassifier(p, training, y, k); % Module to compute a weak classifier
+    [theta,b,epsilon] = WeakClassifier(p, training, y, k, 0.1); % Module to compute a weak classifier
     F = (XX')*theta + b; % F, aka the classifier values 
     a = 0.5*log((1 - epsilon)/epsilon); % Compute weight 
     weights = weights.*exp(-y.*F); % wn_i+1 = wn_i * exp(-y_n * F(x_n))

@@ -77,7 +77,7 @@ while iter < itermax
     end
     iter = iter + 1;
     xiter = [xiter,x];
-    %fprintf('iter = ',iter, '\n'); 
+    %fprintf('iter = %d \n',iter); 
 end
 if iter == itermax
     %fprintf('Stopped because the max number of iterations %d is performed\n',iter);
