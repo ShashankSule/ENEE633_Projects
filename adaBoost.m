@@ -1,3 +1,9 @@
+function [thetas, B, A, P] = adaBoost(training, y, x,k) 
+% arguments:
+% training -- training data
+% y -- training labels
+% x -- test object
+% k -- kernel 
 %% let's do AdaBoost here! 
 % First a set up  + initializations
 K = 10; % Number of boosts! 
@@ -9,8 +15,12 @@ thetas = []; % K x size(training,2) vector to store all the classifiers
 B = []; % store all the constant shift terms (we'll add it later to the classifiers) 
 A = []; % K x 1 vector to store all the weights 
 P = []; 
-sigma = 0.1; % kernel bandwidth
-k = @(x,y) exp(-(norm(x-y)^2)/(2*sigma)) ; %kernel 
+
+if ~exist('k', 'var')
+    sigma = 0.1; % kernel bandwidth
+    k = @(x,y) exp(-(norm(x-y)^2)/(2*sigma)) ; %kernel
+end
+
 % form kernel matrix: we'll need this for evaluation 
 for i = 1:n
     for j = 1:n

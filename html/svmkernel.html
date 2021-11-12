@@ -1,0 +1,290 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>svmkernel</title><meta name="generator" content="MATLAB 9.10"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2021-11-11"><meta name="DC.source" content="svmkernel.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Here find the SVM for the projected data using the active set method</a></li><li><a href="#3">Setting up arguments for ASM.m</a></li><li><a href="#4">Time to run the solver!</a></li><li><a href="#5">Clean up output</a></li><li><a href="#6">Computing B via support vectors</a></li><li><a href="#7">Compute training error!</a></li><li><a href="#8">plot the surface!</a></li><li><a href="#9">compute label of test data</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> [label,trainingerr] = svmkernel(training, y, test,k)
+</pre><h2 id="2">Here find the SVM for the projected data using the active set method</h2><p>The only difference between the kernel case and the linear case is that in the linear case XX is the data matrix (because the feature map is always identity) kernel case XX is the kernel matrix Furthermore, the final map we get</p><h2 id="3">Setting up arguments for ASM.m</h2><pre class="codeinput"><span class="comment">%[training,y] = loadandfiddle(); %data matrix</span>
+data = training;
+c = 100; <span class="comment">%Constant in the soft margin penalty function</span>
+n = length(y); <span class="comment">% number of data points</span>
+<span class="comment">%D = [(y*y').*((XX * XX')) zeros(n,n); zeros(n,n) zeros(n,n)]; %SPD matrix</span>
+<span class="comment">%                                                              in quadratic</span>
+<span class="comment">%                                                              program</span>
+
+<span class="comment">% set kernel</span>
+<span class="keyword">if</span> ~exist(<span class="string">'k'</span>, <span class="string">'var'</span>)
+    sigma = 100; <span class="comment">% variance parameter</span>
+    k = @(x,y) exp(-(norm(x-y)^2)/(2*sigma));
+<span class="keyword">end</span>
+
+XX = zeros(n,n);
+<span class="comment">% form kernel matrix</span>
+<span class="keyword">for</span> i = 1:n
+    <span class="keyword">for</span> j = 1:n
+        XX(i,j) = k(data(i,:), data(j,:)); <span class="comment">% calculate k(x_i, x_j)</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+
+<span class="comment">% compute [D}_ij = y_i y_j k(x_i, x_j); after this rest of the steps</span>
+<span class="comment">% are the same as the linear case</span>
+
+D = (y*y').*XX;
+
+
+<span class="comment">%reducing to n-1 vars: we must do this since ASM.m only takes in active</span>
+<span class="comment">%constraints</span>
+
+yn = y(end);
+D00 = D(1:end-1,1:end-1);
+D01 = D(1:end-1,end);
+D10 = D(end,1:end-1);
+D11 = D(end,end);
+<span class="comment">%new matrix</span>
+Htil = D00 + y(1:n-1)*D11*y(1:n-1)' - (1/yn)*y(1:n-1)*D10 <span class="keyword">...</span>
+       - (1/yn)*D01*y(1:n-1)'; <span class="comment">% new hessian</span>
+d = ones(n-1, 1) - (1/yn)*y(1:n-1); <span class="comment">% new first order term</span>
+cons = (-1/yn)*y(1:n-1)'; <span class="comment">% last row of lhs of constraints</span>
+                          <span class="comment">% lambda_n row vector</span>
+C = [eye(n-1,n-1); cons]; <span class="comment">% lhs of constraints</span>
+b = zeros(n,1); <span class="comment">% rhs of constraints</span>
+
+<span class="comment">%set of active constraints at the initial point</span>
+x = zeros(n-1,1); <span class="comment">% the initialization is zeros everywhere</span>
+W = 1:n; <span class="comment">% at the initial point all constraints are active</span>
+W = W'; <span class="comment">% making the set of active constraints a column vector</span>
+Htil = Htil - (min(eig(Htil)) - 1)*eye(n-1,n-1); <span class="comment">% Make sure to avoid shitty conditioning</span>
+gfun = @(x)Htil*x - d; <span class="comment">%gradient function</span>
+Hfun = @(x)Htil; <span class="comment">%hessian function</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in svmkernel (line 10)
+data = training; 
+</pre><h2 id="4">Time to run the solver!</h2><pre class="codeinput">[lambs, ~] = ASM(x, gfun, Hfun, C, b, W); <span class="comment">% run asm</span>
+</pre><h2 id="5">Clean up output</h2><pre class="codeinput">soln = lambs(:,end); <span class="comment">% extracting the lambda vector</span>
+lambend = cons*soln; <span class="comment">% extract the last lambda</span>
+soln = [soln; lambend]; <span class="comment">% put all the lambda's together</span>
+opt = zeros(n,1);
+pos_lams = find(soln &gt; 1e-6); <span class="comment">%find all the lambdas that are actually pos</span>
+opt(pos_lams) = soln(pos_lams); <span class="comment">%opt is now the vector of all the positive lambdas</span>
+wASM = (XX')*(y .* soln); <span class="comment">% wASM here is phi, the vector of evaluations in</span>
+                          <span class="comment">% the hilbert space</span>
+</pre><h2 id="6">Computing B via support vectors</h2><p>let x+ and x- be the points in the + and - classes with the largest lambdas. then b = 1 - phi(x+) and b = -1 + phi(x-) so b = - (phi(x+) + phi(x-) / 2)</p><pre class="codeinput">avg = XX(soln == max(soln(y==1)),:) <span class="keyword">...</span>
+ + XX(soln == max(soln(y==-1)),:);
+<span class="comment">% avg = XX(abs(soln(y==1)-(c/2)) == min(abs(soln(y==1)-(c/2))),:) ...</span>
+<span class="comment">%       + XX(abs(soln(y==-1)-(c/2)) == min(abs(soln(y==-1)-(c/2))),:);</span>
+B = -0.5*(wASM(soln == max(soln(y==1))) + wASM(soln == max(soln(y == -1))));
+</pre><h2 id="7">Compute training error!</h2><pre class="codeinput">wASM = wASM + B;
+proj_vals = 2*(wASM &gt; 0) - 1; <span class="comment">% form phi(x_n) + b &gt; 0 vector</span>
+indicator = abs(proj_vals - y)/2; <span class="comment">% form I_{y_n != F(x_n)}</span>
+trainingerr = (1/n)*sum(indicator);
+</pre><h2 id="8">plot the surface!</h2><pre class="codeinput"><span class="comment">% % figure out x,y, and z limits of the plot</span>
+<span class="comment">% xlim = min(XX(:,1));</span>
+<span class="comment">% xLim = max(XX(:,1));</span>
+<span class="comment">% ylim = min(XX(:,2));</span>
+<span class="comment">% yLim = max(XX(:,2));</span>
+<span class="comment">% X = linspace(xlim, xLim, 2);</span>
+<span class="comment">% Y = linspace(ylim, yLim, 2);</span>
+<span class="comment">% [xx, yy] = meshgrid(X,Y);</span>
+<span class="comment">% % equation for the plane is z = (-theta1/theta3)x + (-theta2/theta3) + b</span>
+<span class="comment">%</span>
+<span class="comment">% zz = (-wASM(1)/wASM(end-1))*xx + (-wASM(2)/wASM(end-1))*yy + wASM(end)*ones(size(xx));</span>
+<span class="comment">% %% Plot!</span>
+<span class="comment">%</span>
+<span class="comment">% surf(xx,yy,zz, 'FaceAlpha',0.5, 'FaceColor', 'b', 'EdgeColor', 'none')</span>
+<span class="comment">% hold on;</span>
+<span class="comment">% scatter3(XX(:,1), XX(:,2), XX(:,3), 20, 10*y);</span>
+<span class="comment">% colormap(flag);</span>
+<span class="comment">% colorbar</span>
+</pre><h2 id="9">compute label of test data</h2><pre class="codeinput"><span class="comment">%x = training(400,:);</span>
+K = zeros(n,1);
+<span class="keyword">for</span> i=1:n
+    K(i) = k(test,training(i,:)); <span class="comment">% K is [K(x,x_i)] vector</span>
+<span class="keyword">end</span>
+
+label = sign(B + K'*(y.*soln));
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2021a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [label,trainingerr] = svmkernel(training, y, test,k)
+%% Here find the SVM for the projected data using the active set method
+% The only difference between the kernel case and the linear case is that
+% in the 
+% linear case XX is the data matrix (because the feature map is always identity) 
+% kernel case XX is the kernel matrix 
+% Furthermore, the final map we get 
+%% Setting up arguments for ASM.m 
+%[training,y] = loadandfiddle(); %data matrix
+data = training; 
+c = 100; %Constant in the soft margin penalty function 
+n = length(y); % number of data points
+%D = [(y*y').*((XX * XX')) zeros(n,n); zeros(n,n) zeros(n,n)]; %SPD matrix 
+%                                                              in quadratic 
+%                                                              program 
+
+% set kernel 
+if ~exist('k', 'var')
+    sigma = 100; % variance parameter 
+    k = @(x,y) exp(-(norm(x-y)^2)/(2*sigma));
+end
+
+XX = zeros(n,n); 
+% form kernel matrix 
+for i = 1:n
+    for j = 1:n
+        XX(i,j) = k(data(i,:), data(j,:)); % calculate k(x_i, x_j) 
+    end
+end
+
+% compute [D}_ij = y_i y_j k(x_i, x_j); after this rest of the steps 
+% are the same as the linear case 
+
+D = (y*y').*XX;
+
+
+%reducing to n-1 vars: we must do this since ASM.m only takes in active
+%constraints
+
+yn = y(end);
+D00 = D(1:end-1,1:end-1);
+D01 = D(1:end-1,end);
+D10 = D(end,1:end-1);
+D11 = D(end,end);
+%new matrix
+Htil = D00 + y(1:n-1)*D11*y(1:n-1)' - (1/yn)*y(1:n-1)*D10 ...
+       - (1/yn)*D01*y(1:n-1)'; % new hessian 
+d = ones(n-1, 1) - (1/yn)*y(1:n-1); % new first order term 
+cons = (-1/yn)*y(1:n-1)'; % last row of lhs of constraints
+                          % lambda_n row vector 
+C = [eye(n-1,n-1); cons]; % lhs of constraints
+b = zeros(n,1); % rhs of constraints
+
+%set of active constraints at the initial point
+x = zeros(n-1,1); % the initialization is zeros everywhere
+W = 1:n; % at the initial point all constraints are active
+W = W'; % making the set of active constraints a column vector 
+Htil = Htil - (min(eig(Htil)) - 1)*eye(n-1,n-1); % Make sure to avoid shitty conditioning
+gfun = @(x)Htil*x - d; %gradient function
+Hfun = @(x)Htil; %hessian function 
+%% Time to run the solver! 
+[lambs, ~] = ASM(x, gfun, Hfun, C, b, W); % run asm 
+
+%% Clean up output
+soln = lambs(:,end); % extracting the lambda vector
+lambend = cons*soln; % extract the last lambda
+soln = [soln; lambend]; % put all the lambda's together
+opt = zeros(n,1); 
+pos_lams = find(soln > 1e-6); %find all the lambdas that are actually pos
+opt(pos_lams) = soln(pos_lams); %opt is now the vector of all the positive lambdas
+wASM = (XX')*(y .* soln); % wASM here is phi, the vector of evaluations in
+                          % the hilbert space
+%% Computing B via support vectors
+%
+% let x+ and x- be the points in the + and - classes with the largest
+% lambdas. then b = 1 - phi(x+) and b = -1 + phi(x-) so b = - (phi(x+) +
+% phi(x-) / 2) 
+avg = XX(soln == max(soln(y==1)),:) ...
+ + XX(soln == max(soln(y==-1)),:);
+% avg = XX(abs(soln(y==1)-(c/2)) == min(abs(soln(y==1)-(c/2))),:) ...
+%       + XX(abs(soln(y==-1)-(c/2)) == min(abs(soln(y==-1)-(c/2))),:); 
+B = -0.5*(wASM(soln == max(soln(y==1))) + wASM(soln == max(soln(y == -1))));
+%% Compute training error!
+wASM = wASM + B;
+proj_vals = 2*(wASM > 0) - 1; % form phi(x_n) + b > 0 vector
+indicator = abs(proj_vals - y)/2; % form I_{y_n != F(x_n)}
+trainingerr = (1/n)*sum(indicator); 
+%% plot the surface! 
+
+% % figure out x,y, and z limits of the plot 
+% xlim = min(XX(:,1)); 
+% xLim = max(XX(:,1)); 
+% ylim = min(XX(:,2)); 
+% yLim = max(XX(:,2));  
+% X = linspace(xlim, xLim, 2); 
+% Y = linspace(ylim, yLim, 2); 
+% [xx, yy] = meshgrid(X,Y); 
+% % equation for the plane is z = (-theta1/theta3)x + (-theta2/theta3) + b
+% 
+% zz = (-wASM(1)/wASM(end-1))*xx + (-wASM(2)/wASM(end-1))*yy + wASM(end)*ones(size(xx)); 
+% %% Plot! 
+% 
+% surf(xx,yy,zz, 'FaceAlpha',0.5, 'FaceColor', 'b', 'EdgeColor', 'none')
+% hold on; 
+% scatter3(XX(:,1), XX(:,2), XX(:,3), 20, 10*y);
+% colormap(flag);
+% colorbar 
+%% compute label of test data
+%x = training(400,:); 
+K = zeros(n,1); 
+for i=1:n
+    K(i) = k(test,training(i,:)); % K is [K(x,x_i)] vector
+end
+
+label = sign(B + K'*(y.*soln)); 
+end
+##### SOURCE END #####
+--></body></html>

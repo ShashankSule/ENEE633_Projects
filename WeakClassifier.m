@@ -48,7 +48,7 @@ D01 = D(1:end-1,end);
 D10 = D(end,1:end-1);
 D11 = D(end,end);
 %new matrix
-Htil = D00 + y(1:n-1)'*D11*y(1:n-1) - (1/yn)*y(1:n-1)*D10 ...
+Htil = D00 + y(1:n-1)*D11*y(1:n-1)' - (1/yn)*y(1:n-1)*D10 ...
        - (1/yn)*D01*y(1:n-1)'; % new hessian 
 d = ones(n-1, 1) - (1/yn)*y(1:n-1); % new first order term 
 cons = (-1/yn)*y(1:n-1)'; % last row of lhs of constraints

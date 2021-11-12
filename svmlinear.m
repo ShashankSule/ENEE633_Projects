@@ -44,7 +44,7 @@ Hfun = @(x)Htil; %hessian function
 % opt = mpcActiveSetOptions; 
 % iA0 = true(n,1); % at the initial point all constraints are active 
 % [x,exitflag,iA,lambda] = mpcActiveSetSolver(Htil, d, C,b, Ceq, beq, iA0, opt); 
-[lambs, lm] = ASM(x, gfun, Hfun, C, b, W); % run asm 
+[lambs, lm] = ASM(x, gfun, Hfun, C, b, W, 2000); % run asm 
 
 %% Clean up output
 soln = lambs(:,end); % extracting the lambda vector
