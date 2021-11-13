@@ -34,6 +34,9 @@ while iter < itermax
         M = H;
         RHS = -g;
     end
+    fprintf('Solving KKT system now \n'); 
+    fprintf('Norm of LHS: %d \n', norm(M(:))); 
+    fprintf('Norm of RHS: %d \n', norm(RHS)); 
     aux = M\RHS;
     p = aux(1:dim);
     lm = aux(dim+1:end);
@@ -43,7 +46,7 @@ while iter < itermax
             if min(lm) >= 0 % if Lagrange multipliers are positive, we are done
                 % the minimizer is one of the corners
                 fprintf('A local solution is found, iter = %d\n',iter);
-                fprintf('x = [\n'); fprintf('%d\n',x);fprintf(']\n');
+                %fprintf('x = [\n'); fprintf('%d\n',x);fprintf(']\n');
                 break;
             else % remove the index of the most negative multiplier from W
                 [lmin,imin] = min(lm);
@@ -52,7 +55,7 @@ while iter < itermax
             end
         else
             fprintf('A local solution is found, iter = %d\n',iter);
-            fprintf('x = [\n'); fprintf('%d\n',x);fprintf(']\n');
+            %fprintf('x = [\n'); fprintf('%d\n',x);fprintf(']\n');
             break;
         end    
     else % if step is nonzero

@@ -6,15 +6,21 @@ function label = svmkernel(training, y, test,k)
 % kernel case XX is the kernel matrix 
 % Furthermore, the final map we get 
 %% Setting up arguments for ASM.m 
-%[training,y] = loadandfiddle(); %data matrix
+% [training,y] = loadandfiddle(); %data matrix
+%data = training(41:end, :); 
+%y = y(41:end); 
 data = training; 
 y = double(y); 
+y = 2*y - 3; % nominal to float conversion 
 c = 100; %Constant in the soft margin penalty function 
 n = length(y); % number of data points
 %D = [(y*y').*((XX * XX')) zeros(n,n); zeros(n,n) zeros(n,n)]; %SPD matrix 
 %                                                              in quadratic 
-%                                                              program 
-
+%           
+% fprintf('number of training points: %d \n',size(training,1));
+% fprintf('number of training labels: %d \n', size(y,1));
+% fprintf('Number of 1s: %d \n', sum(y==1));
+% fprintf('Number of -1s: %d \n', sum(y==-1));
 % set kernel 
 if ~exist('k', 'var')
     sigma = 100; % variance parameter 
@@ -56,36 +62,40 @@ b = zeros(n,1); % rhs of constraints
 x = zeros(n-1,1); % the initialization is zeros everywhere
 W = 1:n; % at the initial point all constraints are active
 W = W'; % making the set of active constraints a column vector 
-Htil = Htil - (min(eig(Htil)) - 1)*eye(n-1,n-1); % Make sure to avoid shitty conditioning
+Htil = Htil - (min(eig(Htil)) - 10)*eye(n-1,n-1); % Make sure to avoid shitty conditioning
 gfun = @(x)Htil*x - d; %gradient function
 Hfun = @(x)Htil; %hessian function 
 %% Time to run the solver! 
-[lambs, ~] = ASM(x, gfun, Hfun, C, b, W); % run asm 
+fprintf('Norm of initial hessian: %d \n', norm(Htil(:)));
+fprintf('Norm of initial gradient %d \n', norm(d));
+[lambs, ~] = ASM(x, gfun, Hfun, C, b, W,100); % run asm 
 
 %% Clean up output
 soln = lambs(:,end); % extracting the lambda vector
 lambend = cons*soln; % extract the last lambda
 soln = [soln; lambend]; % put all the lambda's together
-opt = zeros(n,1); 
-pos_lams = find(soln > 1e-6); %find all the lambdas that are actually pos
-opt(pos_lams) = soln(pos_lams); %opt is now the vector of all the positive lambdas
+%fprintf('Computed full solution!\n'); 
+%opt = zeros(n,1); 
+%pos_lams = find(soln > 1e-6); %find all the lambdas that are actually pos
+%opt(pos_lams) = soln(pos_lams); %opt is now the vector of all the positive lambdas
 wASM = (XX')*(y .* soln); % wASM here is phi, the vector of evaluations in
                           % the hilbert space
+%fprintf('Computed phi!\n');
 %% Computing B via support vectors
 %
 % let x+ and x- be the points in the + and - classes with the largest
 % lambdas. then b = 1 - phi(x+) and b = -1 + phi(x-) so b = - (phi(x+) +
-% phi(x-) / 2) 
-avg = XX(soln == max(soln(y==1)),:) ...
- + XX(soln == max(soln(y==-1)),:);
-% avg = XX(abs(soln(y==1)-(c/2)) == min(abs(soln(y==1)-(c/2))),:) ...
-%       + XX(abs(soln(y==-1)-(c/2)) == min(abs(soln(y==-1)-(c/2))),:); 
-B = -0.5*(wASM(soln == max(soln(y==1))) + wASM(soln == max(soln(y == -1))));
+% phi(x-) / 2)  
+plus_vec = find(soln == max(soln(y==1)),1,'first');
+minus_vec = find(soln == max(soln(y==-1)), 1, 'first'); 
+B = -0.5*(wASM(plus_vec) + wASM(minus_vec));
+fprintf('Computed constant!\n'); 
 %% Compute training error!
 wASM = wASM + B;
 proj_vals = sign(wASM); % form phi(x_n) + b > 0 vector
 indicator = abs(proj_vals - y)/2; % form I_{y_n != F(x_n)}
-trainingerr = (1/n)*sum(indicator); 
+trainingerr = (1/n)*sum(indicator);
+fprintf('Computed training error!\n');
 %% plot the surface! 
 
 % % figure out x,y, and z limits of the plot 
@@ -107,12 +117,14 @@ trainingerr = (1/n)*sum(indicator);
 % colormap(flag);
 % colorbar 
 %% compute label of test data
-%test = training([399; 400],:); 
+%test = training(200:240,:); 
 K = zeros(n,size(test,1));
+fprintf('Now testing...\n'); 
 for j = 1:size(test,1)
     for i=1:n
         K(i,j) = k(test(j,:),training(i,:)); % K is [K(x,x_i)] vector
     end
 end
+fprintf('Now computing labels\n'); 
 label = double(sign(B + K'*(y.*soln))); 
 end
