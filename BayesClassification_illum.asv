@@ -1,6 +1,6 @@
 %% we'll write a bayes classifier for mda-illuminated data
 
-[pca_data,~,y] = loadandfiddleIllumination();
+[~,mda_data,y] = loadandfiddleIllumination();
 testing_err_Bayes = zeros(19,1);
 %%
 for K = 2:20
@@ -10,10 +10,10 @@ n_classes = size(unique(y),1);
 size_classes = sum(y==1);
 %K = 3; % number of training points in each class 
 training_inds = repelem(size_classes*(0:(n_classes-1)) + 1, K) + repmat(0:(K-1), 1, 68);
-training = pca_data(training_inds, :); 
+training = mda_data(training_inds, :); 
 training_labels = y(training_inds);
-test_inds = setdiff(1:size(pca_data,1),training_inds);
-test = pca_data(test_inds,:);
+test_inds = setdiff(1:size(mda_data,1),training_inds);
+test = mda_data(test_inds,:);
 test_labels = y(test_inds); 
 
 %training = mda_data; 
@@ -63,6 +63,6 @@ end
 
 
 %% plot error data
-plot(2:20, 100*testing_err_Bayes(2:end), 'bo-');
+plot(2:20, testing_err_Bayes, 'bo-');
 xlabel("Number of training points per class", 'Interpreter', 'latex'); 
-ylabel("Percentage testing error", 'Interpreter', 'latex'); 
+ylabel("Training error", 'Interpreter', 'latex'); 

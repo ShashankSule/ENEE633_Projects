@@ -1,4 +1,3 @@
-function [pca_data, mda_data, y] = loadandfiddleIllumination()
 %% let's load illumination data here 
 illumination = load('illumination.mat');
 raw_data = illumination.illum; 
@@ -48,7 +47,7 @@ centered_data = data - repmat(avg, size(data,1), 1);
 covar = centered_data' * centered_data; 
  
 %%  eigenvalue computation here
-[V,D] = eigs(covar,10); 
+[V,D] = eigs(covar,50); 
 pca_data = data*V; 
 
 %% MDA here
@@ -80,5 +79,3 @@ ratios_mda = diag(Sigmas(2:end,2:end))./diag(Sigmas(1:end-1, 1:end-1));
 % xlabel('N', 'Interpreter', 'latex');
 % ylabel('$\lambda_N/\sum_{i=1}^{N-1}\lambda_i$','Interpreter', 'latex'); 
 % legend('PCA', 'MDA', 'Interpreter', 'latex');
-
-end

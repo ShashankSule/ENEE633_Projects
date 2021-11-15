@@ -1,4 +1,9 @@
-%% let's do a supervised k-NN here! 
+%% let's do a supervised k-nn here! 
+[~,mda_data,y] = loadandfiddleIllumination(); 
+
+%% get training and test data
+
+
 
 k = 10; 
 [data, y] = loadandfiddle(); 
@@ -13,6 +18,6 @@ end
 [~,inds] = sort(distances, 'ascend'); 
 k_labels = y(inds(1:10)); %find k nearest labels 
 A = tabulate(k_labels); 
-maximal_labels = find(A(:,3) == max(A(:,3))); % find the most frequent 
+maximal_labels = find(A(:,3) == max(A(:,3)),1); % find the most frequent 
                                               % label among k-NN's
 label = A(maximal_labels(1),1); %find the most popular label 
