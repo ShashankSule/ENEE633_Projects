@@ -37,7 +37,7 @@ end
 
 % compute [D}_ij = y_i y_j k(x_i, x_j); after this rest of the steps 
 % are the same as 
-D = (y*y').*((XX * XX'));
+D = (y*y').*XX;
 
 %reducing to n-1 vars: we must do this since ASM.m only takes in active
 %constraints

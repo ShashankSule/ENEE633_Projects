@@ -1,10 +1,10 @@
-function [label, thetas, B, A, P] = adaBoost(training, y, test, K, k) 
+%function [thetas, B, A, P] = adaBoost(training, y, test, K, k) 
 % arguments:
-% training -- training data as n x d matrix
-% y -- training labels as n x 1 matrix 
-% x -- test object as M x d matrix
-% K -- number of boosts integer
-% k -- kernel: R^d x R^d --> R 
+% training -- training data
+% y -- training labels
+% x -- test object
+% K -- number of boosts
+% k -- kernel 
 %% let's do AdaBoost here! 
 % First a set up  + initializations
 % K = 10; % Number of boosts! 
@@ -44,7 +44,7 @@ for i=1:K
 end
 
 %% Finally, to compute the value of the boosted classifier F at x we do 
-%test = data(1:end,:); 
+test = data(1:end,:); 
 M = size(test,1); % number of test points 
 Kk = zeros(n,M);
 for j = 1:M
@@ -54,6 +54,6 @@ for j = 1:M
 end
 
 label = sign(A' * (thetas * Kk + repmat(B, 1, M)))';
-end
+
 % F(x) = A' * thetas * [K(x,x_i)]_i + B 
 
