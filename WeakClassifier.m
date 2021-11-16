@@ -86,6 +86,7 @@ while trainingerr > (0.5 - tol)
     slack_var = find(opt > 0, 1); % pick a support vector
     B = (1/y(slack_var)*soln(slack_var)) - wASM(slack_var); % use comp slack
     wASM = wASM + B; 
+    
     % compute training error 
     proj_vals = 2*(wASM > 0) - 1; % form phi(x_n) + b > 0 vector
     indicator = abs(proj_vals - y)/2; % form I_{y_n != F(x_n)}

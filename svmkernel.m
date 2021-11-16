@@ -6,12 +6,16 @@ function label = svmkernel(training, y, test,k)
 % kernel case XX is the kernel matrix 
 % Furthermore, the final map we get 
 %% Setting up arguments for ASM.m 
-% [training,y] = loadandfiddle(); %data matrix
+%[~, training,y] = loadandfiddle(); %data matrix
 %data = training(41:end, :); 
 %y = y(41:end); 
 data = training; 
-y = double(y); 
-y = 2*y - 3; % nominal to float conversion 
+
+if isa(y,'nominal')
+    y = double(y); 
+    y = 2*y - 3; % nominal to float conversion 
+end
+
 c = 100; %Constant in the soft margin penalty function 
 n = length(y); % number of data points
 %D = [(y*y').*((XX * XX')) zeros(n,n); zeros(n,n) zeros(n,n)]; %SPD matrix 
@@ -68,10 +72,10 @@ Hfun = @(x)Htil; %hessian function
 %% Time to run the solver! 
 fprintf('Norm of initial hessian: %d \n', norm(Htil(:)));
 fprintf('Norm of initial gradient %d \n', norm(d));
-[lambs, ~] = ASM(x, gfun, Hfun, C, b, W,100); % run asm 
+[lambs, ~] = ASM(x, gfun, Hfun, C, b, W,2000); % run asm 
 
 %% Clean up output
-soln = lambs(:,end); % extracting the lambda vector
+soln = real(lambs(:,end)); % extracting the lambda vector
 lambend = cons*soln; % extract the last lambda
 soln = [soln; lambend]; % put all the lambda's together
 %fprintf('Computed full solution!\n'); 
@@ -93,8 +97,9 @@ fprintf('Computed constant!\n');
 %% Compute training error!
 wASM = wASM + B;
 proj_vals = sign(wASM); % form phi(x_n) + b > 0 vector
-indicator = abs(proj_vals - y)/2; % form I_{y_n != F(x_n)}
-trainingerr = (1/n)*sum(indicator);
+%indicator = abs(proj_vals - y)/2; % form I_{y_n != F(x_n)}
+%trainingerr = (1/n)*sum(indicator);
+trainingerr = mean(proj_vals ~= y); 
 fprintf('Computed training error!\n');
 %% plot the surface! 
 

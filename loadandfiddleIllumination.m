@@ -48,7 +48,7 @@ centered_data = data - repmat(avg, size(data,1), 1);
 covar = centered_data' * centered_data; 
  
 %%  eigenvalue computation here
-[V,D] = eigs(covar,10); 
+[V,D] = eigs(covar,50); 
 pca_data = data*V; 
 
 %% MDA here
@@ -70,15 +70,15 @@ perc_eig_sums_mda = diag(Sigmas(2:end, 2:end))./eig_sums_mda(2:end);
 ratios_mda = diag(Sigmas(2:end,2:end))./diag(Sigmas(1:end-1, 1:end-1));
 
 %% plot the data
-% figure(); 
-% plot(perc_eig_sums_pca, 'bo-');
+figure(); 
+plot(perc_eig_sums_pca, 'bo-');
 % hold on;
 % plot(perc_eig_sums_mda, 'ro-'); 
 % hold on; 
 % plot(0.05*ones(size(perc_eig_sums_mda)), 'k-');
-% title('Running eigenvalue sum percentage change for MDA and PCA eigenvalues', 'Interpreter', 'latex'); 
-% xlabel('N', 'Interpreter', 'latex');
-% ylabel('$\lambda_N/\sum_{i=1}^{N-1}\lambda_i$','Interpreter', 'latex'); 
+title('Percentage change in the running eigenvalue sum for PCA eigenvalues', 'Interpreter', 'latex'); 
+xlabel('N', 'Interpreter', 'latex');
+ylabel('$\lambda_N/\sum_{i=1}^{N-1}\lambda_i$','Interpreter', 'latex'); 
 % legend('PCA', 'MDA', 'Interpreter', 'latex');
 
 end

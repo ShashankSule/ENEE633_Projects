@@ -34,9 +34,9 @@ while iter < itermax
         M = H;
         RHS = -g;
     end
-    fprintf('Solving KKT system now \n'); 
-    fprintf('Norm of LHS: %d \n', norm(M(:))); 
-    fprintf('Norm of RHS: %d \n', norm(RHS)); 
+    %fprintf('Solving KKT system now \n'); 
+    %fprintf('Norm of LHS: %d \n', norm(M(:))); 
+    %fprintf('Norm of RHS: %d \n', norm(RHS)); 
     aux = M\RHS;
     p = aux(1:dim);
     lm = aux(dim+1:end);
