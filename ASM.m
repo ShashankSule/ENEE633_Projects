@@ -37,7 +37,8 @@ while iter < itermax
     %fprintf('Solving KKT system now \n'); 
     %fprintf('Norm of LHS: %d \n', norm(M(:))); 
     %fprintf('Norm of RHS: %d \n', norm(RHS)); 
-    aux = M\RHS;
+    %aux = M\RHS;
+    aux = lsqminnorm(M, RHS); 
     p = aux(1:dim);
     lm = aux(dim+1:end);
     if  norm(p) < TOL  % if step == 0

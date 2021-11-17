@@ -37,7 +37,23 @@ testing_err(l) = mean(bayes_labels ~= test_labels);
 end
 
 %% plot 
-hold on; 
-plot(props, 100*testing_err, 'go-');
-xlabel("Proportion of training points per class", 'Interpreter', 'latex'); 
-ylabel("Percentage testing error", 'Interpreter', 'latex'); 
+figure(); 
+for l = 1:15 
+    plot(sigma_params, 100*cval_errors(l,:), 'o-', 'DisplayName', ...
+         num2str(floor(props(l)*size_classes)));
+    xlabel("$\sigma$", 'Interpreter', 'latex'); 
+    ylabel("Average cross-validation percentage error", 'Interpreter', 'latex'); 
+    set(gca, 'FontSize', 12); 
+    hold on; 
+end
+%% plot optimal sigmas
+
+opt_sigmas = zeros(length(props),1); 
+for i = 1:length(props)
+    [~,ind] = min(cval_errors(i,:));
+    opt_sigmas(i) = sigma_params(ind); 
+end
+
+plot(floor(props*200),opt_sigmas, 'bo-');
+xlabel("Number of training points per class", 'Interpreter', 'latex'); 
+ylabel("Cross-validation error minimimzing variance parameter", 'Interpreter', 'latex'); 

@@ -71,7 +71,7 @@ Hfun = @(x)Htil; %hessian function
 
 trainingerr = 1;
 iter = 1; 
-while trainingerr > (0.5 - tol) && iter < 1000
+while trainingerr > (0.5 - tol) || iter < 1000
     [lambs, ~] = ASM(x, gfun, Hfun, C, b, W, 100); % run asm
     
     % clean up output to compute the classifier

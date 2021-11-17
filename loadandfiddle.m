@@ -115,7 +115,7 @@ y = [ones(200,1); -1*ones(200,1)];
 % latent are the eigenvalues 
 pca_data = score(:,1:50); % Pick the first 50 principal components based on 
                       % eigenvalue decay 
-mda_data = mda_data(:,1:3); 
+mda_data = mda_data(:,[1;2;10]); 
 % Note: Score coordinates 2,3,4 lead to highly linearly separable data. 
 % Use this! 
 %% Write data to file
