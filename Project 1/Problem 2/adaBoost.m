@@ -37,6 +37,8 @@ for i=1:K
     F = (XX')*theta + b; % F, aka the classifier values 
     a = 0.5*log((1 - epsilon)/epsilon); % Compute weight 
     weights = weights.*exp(-y.*F); % wn_i+1 = wn_i * exp(-y_n * F(x_n))
+    %fprintf('Pausing...\n');
+    %pause(3);
     thetas = [thetas; theta']; % put the weak classifier vectors in 
     B = [B; b]; % update the constant terms in the classifier
     A = [A; a]; % update the weight on each classifier
@@ -53,7 +55,7 @@ for j = 1:M
     end
 end
 
-label = sign(A' * (thetas * Kk + repmat(B, 1, M)))';
+label = sign(A' * ((thetas * Kk) + repmat(B, 1, M)))';
 end
 % F(x) = A' * thetas * [K(x,x_i)]_i + B 
 

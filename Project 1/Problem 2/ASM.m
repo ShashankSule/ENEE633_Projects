@@ -43,7 +43,7 @@ while iter < itermax
     lm = aux(dim+1:end);
     if  norm(p) < TOL  % if step == 0
         if ~isempty(W)
-            lm = AW'\g; % find Lagrange multipliers
+            lm = AW' \ g; % find Lagrange multipliers
             if min(lm) >= 0 % if Lagrange multipliers are positive, we are done
                 % the minimizer is one of the corners
                 fprintf('A local solution is found, iter = %d\n',iter);

@@ -72,17 +72,17 @@ Hfun = @(x)Htil; %hessian function
 %% Time to run the solver! 
 fprintf('Norm of initial hessian: %d \n', norm(Htil(:)));
 fprintf('Norm of initial gradient %d \n', norm(d));
-[lambs, ~] = ASM(x, gfun, Hfun, C, b, W,2000); % run asm 
+[lambs, ~] = ASM(x, gfun, Hfun, C, b, W, 1000); % run asm 
 
 %% Clean up output
 soln = real(lambs(:,end)); % extracting the lambda vector
 lambend = cons*soln; % extract the last lambda
 soln = [soln; lambend]; % put all the lambda's together
 %fprintf('Computed full solution!\n'); 
-%opt = zeros(n,1); 
-%pos_lams = find(soln > 1e-6); %find all the lambdas that are actually pos
-%opt(pos_lams) = soln(pos_lams); %opt is now the vector of all the positive lambdas
-wASM = (XX')*(y .* soln); % wASM here is phi, the vector of evaluations in
+opt = zeros(n,1); 
+pos_lams = find(soln > 1e-6); %find all the lambdas that are actually pos
+opt(pos_lams) = soln(pos_lams); %opt is now the vector of all the positive lambdas
+wASM = (XX')*(y .* opt); % wASM here is phi, the vector of evaluations in
                           % the hilbert space
 %fprintf('Computed phi!\n');
 %% Computing B via support vectors
@@ -100,7 +100,7 @@ proj_vals = sign(wASM); % form phi(x_n) + b > 0 vector
 %indicator = abs(proj_vals - y)/2; % form I_{y_n != F(x_n)}
 %trainingerr = (1/n)*sum(indicator);
 trainingerr = mean(proj_vals ~= y); 
-fprintf('Computed training error!\n');
+fprintf('Training error = %d \n', trainingerr);
 %% plot the surface! 
 
 % % figure out x,y, and z limits of the plot 
